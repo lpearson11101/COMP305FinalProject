@@ -1,8 +1,24 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <span class="title"><h1>{% block title %} The Books Page {% endblock %}</h1></span>
+    <span class="title"><h1>{% block title %} The Search Page {% endblock %}</h1></span>
     <div class="content">
-        <h2>This is the books Flask blueprint</h2>
+        <h2>This is the search Flask blueprint</h2>
     </div>
+    <form action="/search" method="get" class="search-form">
+    <div class="search-container">
+        <input 
+            type="search" 
+            name="q" 
+            placeholder="Search articles..." 
+            value="{{ query }}"
+            autocomplete="off"
+            required
+            minlength="2"
+        >
+        <button type="submit" aria-label="Search">
+            Search
+        </button>
+    </div>
+</form>
 {% endblock %}
