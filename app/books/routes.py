@@ -18,6 +18,10 @@ def index():
     
     return render_template('books/index.html', books=books)
 
+@bp.route('/books')
+def books():
+    return render_template('books/search.html')
+
 @bp.route('/search')
 def search():
     query = request.args.get('q', '').strip()
@@ -31,8 +35,8 @@ def search():
     search_pattern = f'%{query}%'
     results = Book.query.filter(
         db.or_(
-            Book.name.ilike(search_pattern),
-            Book.info.ilike(search_pattern)
+            Book.title.ilike(search_pattern),
+            Book.summary.ilike(search_pattern)
         )
     ).order_by(Book.isbn.desc()).limit(20).all()
     

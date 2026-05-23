@@ -5,7 +5,7 @@
     <div class="content">
         <h2>This is the search Flask blueprint</h2>
     </div>
-    <form action="/search" method="get" class="search-form">
+    <form action="{{ url_for('books.search') }}" method="get" class="search-form">
     <div class="search-container">
         <input 
             type="search" 
