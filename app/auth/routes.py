@@ -19,6 +19,7 @@ from werkzeug.security import (
 from app.auth import bp
 from app.extensions import db
 from app.models.user import User
+from app.auth.services import validate_password
 
 # Register route
 @bp.route("/register", methods=["GET", "POST"])
@@ -37,6 +38,21 @@ def register():
             return render_template(
                 "auth/register.html",
                 error="Username already taken!"
+            )
+        
+        if not username or not password:
+            return render_template(
+                "auth/register.html",
+                error="Username and password are required!"
+            )
+        
+        is_valid, message = validate_password(password)
+
+        if not is_valid:
+
+            return render_template(
+                "auth/register.html",
+                error=message
             )
 
         hashed_password = generate_password_hash(

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Search Results</h1>
+
+<p>You searched for: {{ query }}</p>
+
+{% for book in results %}
+
+    <div>
+        <h3>{{ <book class="title"></book> }}</h3>
+        <p>{{ <book class="author"></book> }}</p>
+    </div>
+
+{% endfor %}
+
+{% endblock %}
