@@ -10,8 +10,28 @@ def index():
     books = Book.query.all()
 
     if request.method == 'POST':
+        name = request.form.get("Book")
+        info = request.form.get("Information")
         new_book = Book(name=request.form['book'],
                         info=request.form['information'])
+        
+
+        existing_book = Book.query.filter_by(
+            name=name
+        ).first()
+
+        if existing_book:
+            return render_template(
+                "books/index.html",
+                error="Book already added!"
+            )
+        
+        if not name or not info:
+            return render_template(
+                "books/index.html",
+                error="Book name and information are required!"
+            )
+        
         db.session.add(new_book)
         db.session.commit()
         return redirect(url_for('books.index'))
