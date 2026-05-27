@@ -9,8 +9,20 @@
 {% for book in results %}
 
     <div>
-        <h3>{{ <book class="title"></book> }}</h3>
-        <p>{{ <book class="author"></book> }}</p>
+        <h3>{{ book.title }}</h3>
+        <p>{{ book.author }}</p>
+        <p>{{ book.publisher }}</p>
+        <p>{{ book.isbn }}</p>
+        <p>{{ book.cover_id }}</p>
+        <p>{{ book.summary }}</p>
+        <p>{{ book.year_published }}</p>
+        <p>{{ book.genre }}</p>
+        <p>{{ book.length }}</p>
+        <p>{{ book.agg_enjoyment }}</p>
+        <p>{{ book.agg_aura }}</p>
+        <p>{{ book.persona_one }}</p>
+        <p>{{ book.persona_two }}</p>
+        <p>{{ book.persona_three }}</p>
     </div>
 
 {% endfor %}
