@@ -30,7 +30,7 @@ def create_app(config_class=Config):
     from app.models import user
     from app.auth import user_loader
     from app.models.book import Book
-    from app.models.userbook import Book
+    from app.models.userbook import UserBook
 
     # Register blueprints
     from app.main import bp as main_bp
