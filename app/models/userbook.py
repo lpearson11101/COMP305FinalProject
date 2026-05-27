@@ -1,7 +1,7 @@
 # User model
 from app.extensions import db
 
-class Book(db.Model):
+class UserBook(db.Model):
 
     # A book's ID. Acts as the primary key
     userbook_id = db.Column(db.Integer, primary_key=True)
@@ -22,7 +22,7 @@ class Book(db.Model):
     top_five = db.Column(db.Integer)
 
     # What does the user rank this book? Must be tested to ensure the book was read   
-    enjoyment = db.Column(db.float)
+    enjoyment = db.Column(db.Float)
 
     # What does the user rank the A.U.R.A of this book?
-    aura = db.Column(db.float)
+    aura = db.Column(db.Float)
