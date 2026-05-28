@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <span class="title">
+        <h1>{% block title %} Book Details {% endblock %}</h1>
+    </span>
+
+    <div class="books">
+        <h2>{{ book.title }}</h2>
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>Genre:</strong> {{ book.genre }}</p>
+        <p><strong>Summary:</strong> {{ book.summary }}</p>
+
+        {% if book.cover_id %}
+            <img src="{{ url_for('static', filename='covers/' ~ book.cover_id ~ '.jpg') }}" 
+                 alt="{{ book.title }} cover" width="200">
+        {% endif %}
+
+        <p><strong>A.U.R.A.:</strong> {{ book.agg_aura }}</p>
+        <p><strong>Enjoyment:</strong> {{ book.agg_enjoyment }}</p>
+
+        <div class="book-actions">
+            <form action="{{ url_for('books.mark_read', book_id=book.id) }}" method="post">
+                <input type="submit" value="Mark as Read">
+            </form>
+
+            <form action="{{ url_for('books.add_to_read', book_id=book.id) }}" method="post">
+                <input type="submit" value="To‑Read">
+            </form>
+
+            <form action="{{ url_for('books.add_top_five', book_id=book.id) }}" method="post">
+                <input type="submit" value="Top Five">
+            </form>
+        </div>
+
+        <hr>
+
+        <div class="nav-links">
+            <a href="{{ url_for('books.search') }}">Back to Search</a> |
+            <a href="{{ url_for('users.profile') }}">Go to Profile</a>
+        </div>
+    </div>
+{% endblock %}

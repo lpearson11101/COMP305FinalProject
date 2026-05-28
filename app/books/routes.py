@@ -63,3 +63,20 @@ def search():
     return render_template('search_results.html', 
                          results=results, 
                          query=query)
+
+@bp.route('/<int:book_id>')
+def detail(book_id):
+    book = Book.query.get_or_404(book_id)
+    return render_template('books/detail.html', book=book)
+
+@bp.route('/mark_read/<int:book_id>', methods=['POST'])
+def mark_read(book_id):
+    return redirect(url_for('books.detail', book_id=book_id))
+
+@bp.route('/add_to_read/<int:book_id>', methods=['POST'])
+def add_to_read(book_id):
+    return redirect(url_for('books.detail', book_id=book_id))
+
+@bp.route('/add_top_five/<int:book_id>', methods=['POST'])
+def add_top_five(book_id):
+    return redirect(url_for('books.detail', book_id=book_id))
