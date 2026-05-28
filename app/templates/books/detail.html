@@ -1,43 +1,39 @@
 {% extends 'base.html' %}
-
 {% block content %}
-    <span class="title">
-        <h1>{% block title %} Book Details {% endblock %}</h1>
-    </span>
+<div class="container mt-4">
+  <h2>{{ book.title }}</h2>
+  <p><strong>Author:</strong> {{ book.author }}</p>
+  <p><strong>Genre:</strong> {{ book.genre }}</p>
+  <p><strong>Summary:</strong> {{ book.summary }}</p>
 
-    <div class="books">
-        <h2>{{ book.title }}</h2>
-        <p><strong>Author:</strong> {{ book.author }}</p>
-        <p><strong>Genre:</strong> {{ book.genre }}</p>
-        <p><strong>Summary:</strong> {{ book.summary }}</p>
+  {% if book.cover_id %}
+    <img src="{{ url_for('static', filename='covers/' ~ book.cover_id ~ '.jpg') }}" 
+         alt="{{ book.title }} cover" class="img-fluid mb-3">
+  {% endif %}
 
-        {% if book.cover_id %}
-            <img src="{{ url_for('static', filename='covers/' ~ book.cover_id ~ '.jpg') }}" 
-                 alt="{{ book.title }} cover" width="200">
-        {% endif %}
+  <p><strong>A.U.R.A. Rating:</strong> {{ book.agg_aura }}</p>
+  <p><strong>Enjoyment Rating:</strong> {{ book.agg_enjoyment }}</p>
 
-        <p><strong>A.U.R.A.:</strong> {{ book.agg_aura }}</p>
-        <p><strong>Enjoyment:</strong> {{ book.agg_enjoyment }}</p>
+  <div class="mt-3">
+    <form action="{{ url_for('books.mark_read', book_id=book.id) }}" method="post">
+      <button type="submit" class="btn btn-secondary">Mark as Read</button>
+    </form>
 
-        <div class="book-actions">
-            <form action="{{ url_for('books.mark_read', book_id=book.id) }}" method="post">
-                <input type="submit" value="Mark as Read">
-            </form>
+    <form action="{{ url_for('books.add_to_read', book_id=book.id) }}" method="post" class="mt-2">
+      <button type="submit" class="btn btn-success">Add to "To-Read" list</button>
+    </form>
 
-            <form action="{{ url_for('books.add_to_read', book_id=book.id) }}" method="post">
-                <input type="submit" value="To‑Read">
-            </form>
+    <form action="{{ url_for('books.add_top_five', book_id=book.id) }}" method="post" class="mt-2">
+      <button type="submit" class="btn btn-warning">Add to "Top-Five" list</button>
+    </form>
+  </div>
 
-            <form action="{{ url_for('books.add_top_five', book_id=book.id) }}" method="post">
-                <input type="submit" value="Top Five">
-            </form>
-        </div>
+  <hr class="my-4">
 
-        <hr>
-
-        <div class="nav-links">
-            <a href="{{ url_for('books.search') }}">Back to Search</a> |
-            <a href="{{ url_for('users.profile') }}">Go to Profile</a>
-        </div>
-    </div>
+  <h4>Comments</h4>
+  <div class="border p-3 bg-light">
+    <p><em>“This section will maybe display user comments later.”</em></p>
+    <p><strong>Big Bruce:</strong> “Kind overrated tbh. Drink beer while reading it to make it better”</p>
+  </div>
+</div>
 {% endblock %}
