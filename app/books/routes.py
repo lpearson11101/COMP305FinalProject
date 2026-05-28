@@ -1,5 +1,6 @@
 from flask import render_template, request, url_for, redirect
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 from app.books import bp
 from app.models.book import Book
 from app.extensions import db
@@ -45,24 +46,20 @@ def books():
 @bp.route('/search')
 def search():
     query = request.args.get('q', '').strip()
-    
+
     if not query:
-        return render_template('search_results.html', 
-                             results=[], 
-                             query='')
-    
-    # Case-insensitive search in title and content
+        return render_template('books/search_results.html', results=[], query='')
+
     search_pattern = f'%{query}%'
     results = Book.query.filter(
-        db.or_(
+        or_(
             Book.title.ilike(search_pattern),
             Book.summary.ilike(search_pattern)
         )
     ).order_by(Book.isbn.desc()).limit(20).all()
-    
-    return render_template('search_results.html', 
-                         results=results, 
-                         query=query)
+
+    return render_template('books/search_results.html', results=results, query=query)
+
 
 @bp.route('/<int:book_id>')
 def detail(book_id):
