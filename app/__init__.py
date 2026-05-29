@@ -8,6 +8,9 @@ from app.extensions import (
     login_manager
 )
 
+from flask_migrate import Migrate
+
+
 
 def create_app(config_class=Config):
 
@@ -21,6 +24,8 @@ def create_app(config_class=Config):
     # Initialize extensions
     db.init_app(app)
 
+    migrate = Migrate(app, db)
+    
     migrate.init_app(app, db)
 
     login_manager.init_app(app)
