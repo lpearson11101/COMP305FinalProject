@@ -7,3 +7,4 @@ How to run the app (development server):
     - set FLASK_APP=app
     - set FLASK_ENV=development
     - flask run
+    - flask db upgrade
