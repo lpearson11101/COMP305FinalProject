@@ -9,13 +9,15 @@ def create_app(config_class=Config):
 
     # init extensions
     db.init_app(app)
-    migrate.init_app(app, db)
+   
     login_manager.init_app(app)
 
     login_manager.login_view = "auth.login"
 
     # register models so Alembic sees them
     from app import models
+
+    migrate.init_app(app, db)
 
     # register blueprints
     from app.main import bp as main_bp
