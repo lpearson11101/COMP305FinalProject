@@ -19,14 +19,27 @@
       <button type="submit" class="btn btn-secondary">Mark as Read</button>
     </form>
 
-    <form action="{{ url_for('books.add_to_read', book_id=book.id) }}" method="post" class="mt-2">
+  <form action="{{ url_for('books.unmark_read', book_id=book.id) }}" method="post" class="mt-2">
+      <button type="submit" class="btn btn-outline-secondary">Mark as Unread</button>
+    </form>
+
+  <form action="{{ url_for('books.mark_to_read', book_id=book.id) }}" method="post" class="mt-2">
       <button type="submit" class="btn btn-success">Add to "To-Read" list</button>
     </form>
 
-    <form action="{{ url_for('books.add_top_five', book_id=book.id) }}" method="post" class="mt-2">
+  <form action="{{ url_for('books.remove_to_read', book_id=book.id) }}" method="post" class="mt-2">
+      <button type="submit" class="btn btn-outline-success">Remove from "To‑Read" list</button>
+    </form>
+
+  <form action="{{ url_for('books.add_top_five', book_id=book.id) }}" method="post" class="mt-2">
       <button type="submit" class="btn btn-warning">Add to "Top-Five" list</button>
     </form>
   </div>
+
+  <form action="{{ url_for('books.remove_top_five', book_id=book.id) }}" method="post" class="mt-2">
+      <button type="submit" class="btn btn-outline-warning">Remove from "Top‑Five" list</button>
+    </form>
+
 
   <hr class="my-4">
 
