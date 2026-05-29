@@ -1,8 +1,8 @@
-# User model
+# Book model
 from app.extensions import db
 
 class Book(db.Model):
-
+    __tablename__ = "books"
     # A book's ID. Acts as the primary key
     id = db.Column(db.Integer, primary_key=True)
 
@@ -47,3 +47,10 @@ class Book(db.Model):
     
     # The third "persona" assigned to a book
     persona_three = db.Column(db.String(250))
+
+    #User-book relationship. If a book is deleted, all user-book interactions with that book are also deleted.
+    user_books = db.relationship(
+        "UserBook",
+        back_populates="book",
+        cascade="all, delete-orphan"
+    )
