@@ -17,6 +17,7 @@ def create_app(config_class=Config):
     # register models so Alembic sees them
     from app import models
 
+
     migrate.init_app(app, db)
 
     # register blueprints
