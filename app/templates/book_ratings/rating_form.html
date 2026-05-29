@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}rating{% endblock %}
+
+{% block content %}
+
+<!--template of the form for adding user ratings to book. unsure what does/doesn't work, but I tried to use
+the same classes and layout as the login page for visual cohesion-->
+
+<div class="row justify-content-center mt-5">
+
+    <div class="col-md-5 col-lg-4">
+
+        <div class="card shadow-sm">
+
+            <div class="card-body p-4">
+
+                <label for="enjoyment">how much did you enjoy this book?:</label>
+                
+                <div class="mb-1"></div>
+                
+                <select id="enjoyment" name="enjoyment">
+                    <option value="item1">1 star</option>
+                    <option value="item2">2 stars</option>
+                    <option value="item3">3 stars</option>
+                    <option value="item4">4 stars</option>
+                    <option value="item5">5 stars</option>
+                </select>
+                
+            </div>
+            
+            <div class ="card-body p-4">
+                <label for="AURA">A.U.R.A. :</label>
+                
+                <div class="mb-1"></div>
+                
+                <select id="AURA" name="AURA">
+                    <option value="item1">1 star</option>
+                    <option value="item2">2 stars</option>
+                    <option value="item3">3 stars</option>
+                    <option value="item4">4 stars</option>
+                    <option value="item5">5 stars</option>
+                </select>
+                
+            </div>
+            
+            <div class ="card-body p-4">
+                <label for="P1">First Persona: </label>
+                
+                <div class="mb-1"></div>
+                
+                <select id="P1" name="P1">
+                    <option value="item1">example: brooder</option>
+                    <option value="item2">example: philosopher</option>
+                    <option value="item3">example: artist</option>
+                    <option value="item4">example: intellectual</option>
+                    <option value="item5">example: wizard</option>
+                </select>
+                
+            </div>
+            
+            <div class ="card-body p-4">
+                <label for="P2">Second Persona: </label>
+                
+                <div class="mb-1"></div>
+                
+                <select id="P2" name="P2">
+                    <option value="item1">example: brooder</option>
+                    <option value="item2">example: philosopher</option>
+                    <option value="item3">example: artist</option>
+                    <option value="item4">example: intellectual</option>
+                    <option value="item5">example: wizard</option>
+                </select>
+                
+            </div>
+            
+            <div class ="card-body p-4">
+                <label for="P3">Third Persona: </label>
+                
+                <div class="mb-1"></div>
+                
+                <select id="P1" name="P1">
+                    <option value="item1">example: brooder</option>
+                    <option value="item2">example: philosopher</option>
+                    <option value="item3">example: artist</option>
+                    <option value="item4">example: intellectual</option>
+                    <option value="item5">example: wizard</option>
+                </select>
+                
+            </div>
+            
+            <div class="mb-3 d-grid">
+
+                <button type="submit" class="btn btn-primary">
+                    submit
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
