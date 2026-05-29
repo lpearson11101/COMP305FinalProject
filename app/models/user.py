@@ -26,3 +26,24 @@ class User(UserMixin, db.Model):
         back_populates="user",
         cascade="all, delete-orphan"
     )
+
+    author_books = db.relationship(
+    "AuthorBook",
+    back_populates="author",
+    cascade="all, delete-orphan"
+    )
+
+    comments = db.relationship(
+        "Comment",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    user_persona_aggregates = db.relationship(
+        "UserPersonaAggregate",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    
+

@@ -12,3 +12,19 @@ class Persona(db.Model):
     # A persona's description, chr limit of 1000 and cannot be null
     description = db.Column(db.String(1000), nullable=False)
 
+    user_book_personas = db.relationship(
+    "UserBookPersona",
+    back_populates="persona"
+    )
+
+    user_persona_aggregates = db.relationship(
+    "UserPersonaAggregate",
+    back_populates="persona"
+    )
+
+    book_persona_aggregates = db.relationship(
+    "BookPersonaAggregate",
+    back_populates="persona",
+    cascade="all, delete-orphan"
+    )
+

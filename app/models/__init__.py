@@ -1,12 +1,14 @@
 from flask import Blueprint
 
 bp = Blueprint('models', __name__)
-from app.models.user import User
-from app.models.book import Book
-from app.models.userbook import UserBook
-from app.models.comment import Comment
-from app.models.persona import Persona
-from app.models.userbookpersona import UserBookPersona
-from app.models.bookpersonaaggregate import BookPersonaAggregate
-from app.models.userpersonaaggregate import UserPersonaAggregate
-from app.models.authorbook import AuthorBook
+
+
+from .user import User
+from .book import Book
+from .userbook import UserBook
+from .authorbook import AuthorBook
+from .comment import Comment
+from .persona import Persona
+from .userbookpersona import UserBookPersona
+from .bookpersonaaggregate import BookPersonaAggregate
+from .userpersonaaggregate import UserPersonaAggregate

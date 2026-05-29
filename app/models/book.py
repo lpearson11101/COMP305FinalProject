@@ -54,3 +54,21 @@ class Book(db.Model):
         back_populates="book",
         cascade="all, delete-orphan"
     )
+
+    author_books = db.relationship(
+    "AuthorBook",
+    back_populates="book",
+    cascade="all, delete-orphan"
+    )
+
+    comments = db.relationship(
+        "Comment",
+        back_populates="book",
+        cascade="all, delete-orphan"
+    )
+
+    book_persona_aggregates = db.relationship(
+        "BookPersonaAggregate",
+        back_populates="book",
+        cascade="all, delete-orphan"
+    )
