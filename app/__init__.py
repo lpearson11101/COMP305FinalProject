@@ -10,7 +10,7 @@ from app.extensions import (
 
 from flask_migrate import Migrate
 
-
+migrate = Migrate()
 
 def create_app(config_class=Config):
 
@@ -23,8 +23,6 @@ def create_app(config_class=Config):
 
     # Initialize extensions
     db.init_app(app)
-
-    migrate = Migrate(app, db)
     
     migrate.init_app(app, db)
 
@@ -35,7 +33,14 @@ def create_app(config_class=Config):
     from app.models import user
     from app.auth import user_loader
     from app.models.book import Book
+    from app.models.user import User
     from app.models.userbook import UserBook
+    from app.models.comment import Comment
+    from app.models.persona import Persona
+    from app.models.userbookpersona import UserBookPersona
+    from app.models.bookpersonaaggregate import BookPersonaAggregate
+    from app.models.userpersonaaggregate import UserPersonaAggregate
+    from app.models.authorbook import AuthorBook
 
     # Register blueprints
     from app.main import bp as main_bp
