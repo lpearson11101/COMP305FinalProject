@@ -1,6 +1,6 @@
 import pytest
 from app import create_app
-from app.extensions import db
+from app.extensions import db as _db
 
 @pytest.fixture()
 def app():
@@ -14,13 +14,26 @@ def app():
     
     with app.app_context():
         # Create all database tables
-        db.create_all()
+        _db.create_all()
         print(app.url_map)
         yield app
         # Clean up after test
-        db.session.remove()
-        db.drop_all()
+        _db.session.remove()
+        _db.drop_all()
 
 @pytest.fixture()
 def client(app):
     return app.test_client()
+
+@pytest.fixture
+def runner(app):
+    return app.test_cli_runner()
+
+@pytest.fixture
+def db():
+    return _db
+
+@pytest.fixture
+def app_context(app):
+    with app.app_context():
+        yield
