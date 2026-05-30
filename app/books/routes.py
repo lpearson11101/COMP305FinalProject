@@ -156,3 +156,27 @@ def remove_top_five(book_id):
         db.session.commit()
     return redirect(url_for('books.detail', book_id=book_id))
 
+@bp.route('/edit_book/<int:book_id>', methods=['POST'])
+def edit_book(book_id):
+    from flask_login import current_user
+
+    if current_user.role != 'admin':
+        return "You're not fancy enough", 403
+
+    book = Book.query.get_or_404(book_id)
+    
+    book.title = request.form.get('title')
+    book.author = request.form.get('author')
+    book.publisher = request.form.get('publisher')
+    book.year_published = request.form.get('year_published')
+    book.isbn = request.form.get('isbn')
+    book.length = request.form.get('length')
+    book.cover_id = request.form.get('cover_id')
+    book.genre = request.form.get('genre')
+    book.summary = request.form.get('summary')
+
+    db.session.commit()
+
+    return redirect(url_for('books.detail', book_id=book.id))
+
+
