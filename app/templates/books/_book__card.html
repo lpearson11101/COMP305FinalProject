@@ -13,10 +13,11 @@
 
 <!-- this is an element that can hopefully be used in search results and the book lists on the 
  user page -->
-
+{% block content %}
 <div class="card text-white bg-dark">
         <div class="book title">{{ book.title }}</div>
         <div class="book image and details">
+
           {% if book.cover_id %}
           <img src="{{ url_for('static', filename='covers/' ~ book.cover_id ~ '.jpg') }}" 
                             alt="{{ book.title }} cover" class="img-fluid mb-3" >
@@ -28,6 +29,7 @@
           >
               go to book
           </a>
-        </a>
+        </div>
         </div>
 </div>
+{% endblock %}

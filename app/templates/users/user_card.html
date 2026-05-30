@@ -1,0 +1,21 @@
+<!-- this is an element that can hopefully be used in search results and the book lists on the 
+ user page -->
+
+<div class="card text-white bg-dark">
+        <div class="username">{{ user.username }}</div>
+        <div class="user details">
+          <!-- I want to maybe display a user's top three personas instead of a profile picture since
+           that is something we aren't storing in the database.-->
+          {% if user %}
+          
+          {% endif %}
+        
+          <a
+              href="{{ }}"
+              class="btn btn-success btn-md me-2"
+          >
+              go to user
+          </a>
+        </div>
+        </div>
+</div>
