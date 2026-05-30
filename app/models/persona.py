@@ -12,8 +12,6 @@ class Persona(db.Model):
     # A persona's description, chr limit of 1000 and cannot be null
     description = db.Column(db.String(1000), nullable=False)
 
-<<<<<<< HEAD
-=======
     user_book_personas = db.relationship(
     "UserBookPersona",
     back_populates="persona"
@@ -30,4 +28,3 @@ class Persona(db.Model):
     cascade="all, delete-orphan"
     )
 
->>>>>>> e6f9731bda3722f5b0995f8d0f940facefa5c828
