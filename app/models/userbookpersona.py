@@ -26,7 +26,11 @@ class UserBookPersona(db.Model):
     #User-book relationship. If a user-book interaction is deleted, all associated userbook_personas are also deleted.
     userbook = db.relationship(
         "UserBook",
+<<<<<<< HEAD
         back_populates="user_book_personas",
+=======
+        back_populates="personas",
+>>>>>>> e6f9731bda3722f5b0995f8d0f940facefa5c828
     )
 
     #Persona relationship. userbookpersona.persona returns <Persona>
