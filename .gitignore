@@ -4,3 +4,5 @@ __pycache__/
 app.db
 *.db
 instance/
+data/*.gz
+data/*.txt

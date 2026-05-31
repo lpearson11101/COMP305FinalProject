@@ -40,7 +40,7 @@ class Book(db.Model):
     agg_aura = db.Column(db.Float, nullable=False)
 
     # The first "persona" assigned to a book, cannot be null
-    persona_one = db.Column(db.String(250), nullable=False)
+    persona_one = db.Column(db.String(250))
 
     # The second "persona" assigned to a book
     persona_two = db.Column(db.String(250))
