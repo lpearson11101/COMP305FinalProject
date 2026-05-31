@@ -142,6 +142,15 @@ def remove_top_five(book_id):
         db.session.commit()
     return redirect(url_for('users.profile'))
 
+@bp.route('/admin/edit/<int:book_id>')
+def admin_page(book_id):
+    if current_user.role != 'admin':
+        return "You're not fancy enough", 403
+
+    book = Book.query.get_or_404(book_id)
+    return render_template('books/admin_page.html', book=book)
+
+
 @bp.route('/edit_book/<int:book_id>', methods=['POST'])
 def edit_book(book_id):
     from flask_login import current_user
