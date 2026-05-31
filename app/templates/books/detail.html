@@ -64,88 +64,11 @@
 
                 <div class="row text-center mt-2">
 
-                    <div class="col-4">
-                        <form action="{{ url_for('books.unmark_read', book_id=book.id) }}" method="post">
-                            <button type="submit" class="btn btn-outline-secondary w-100">Mark Unread</button>
-                        </form>
-                    </div>
-
-                    <div class="col-4">
-                        <form action="{{ url_for('books.remove_to_read', book_id=book.id) }}" method="post">
-                            <button type="submit" class="btn btn-outline-success w-100">Remove "To‑Read"</button>
-                        </form>
-                    </div>
-
-                    <div class="col-4">
-                        <form action="{{ url_for('books.remove_top_five', book_id=book.id) }}" method="post">
-                            <button type="submit" class="btn btn-outline-warning w-100">Remove "Top‑Five"</button>
-                        </form>
-                    </div>
-
-                </div>
-            </div>
-
             {% if current_user.role == 'admin' %}
-            <div class="card mt-4">
-                <div class="card-header bg-danger text-white">
-                    <strong>Admin: Edit Book Details</strong>
-                </div>
-
-                <div class="card-body">
-                    <form action="{{ url_for('books.edit_book', book_id=book.id) }}" method="post">
-
-                        <div class="row mb-3">
-                            <div class="col">
-                                <label class="form-label">Title</label>
-                                <input class="form-control" type="text" name="title" value="{{ book.title }}">
-                            </div>
-                            <div class="col">
-                                <label class="form-label">Author</label>
-                                <input class="form-control" type="text" name="author" value="{{ book.author }}">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col">
-                                <label class="form-label">Publisher</label>
-                                <input class="form-control" type="text" name="publisher" value="{{ book.publisher }}">
-                            </div>
-                            <div class="col">
-                                <label class="form-label">Year Published</label>
-                                <input class="form-control" type="number" name="year_published" value="{{ book.year_published }}">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col">
-                                <label class="form-label">ISBN</label>
-                                <input class="form-control" type="text" name="isbn" value="{{ book.isbn }}">
-                            </div>
-                            <div class="col">
-                                <label class="form-label">Length</label>
-                                <input class="form-control" type="text" name="length" value="{{ book.length }}">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Cover ID</label>
-                            <input class="form-control" type="number" name="cover_id" value="{{ book.cover_id }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Genre</label>
-                            <input class="form-control" type="text" name="genre" value="{{ book.genre }}">
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Summary</label>
-                            <textarea class="form-control" name="summary" rows="4">{{ book.summary }}</textarea>
-                        </div>
-
-                        <button class="btn btn-danger" type="submit">Save Changes</button>
-                    </form>
-                </div>
-            </div>
+            <a href="{{ url_for('books.admin_page', book_id=book.id) }}" 
+            class="btn btn-danger mt-3">
+                Edit Book Details
+            </a>
             {% endif %}
 
             <div class="mt-4">
