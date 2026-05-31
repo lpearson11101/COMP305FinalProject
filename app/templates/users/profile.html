@@ -24,7 +24,20 @@ book lists.-->
       <div class="card text-white bg-dark">
         <div class="card-header">To read</div>
         <div class="card-body">
-          <!--put links to books in here-->
+          {% if to_read_books %}
+    <ul class="list-unstyled">
+        {% for entry in to_read_books %}
+            <li>
+                <a class="text-light" href="{{ url_for('books.detail', book_id=entry.book.id) }}">
+                    {{ entry.book.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="text-muted">No books in your to‑read list.</p>
+{% endif %}
+
         </div>
       </div>
     </div>
@@ -32,7 +45,20 @@ book lists.-->
       <div class="card text-white bg-dark">
         <div class="card-header">My books</div>
         <div class="card-body">
-          <!--put links to books in here-->
+          {% if read_books %}
+    <ul class="list-unstyled">
+        {% for entry in read_books %}
+            <li>
+                <a class="text-light" href="{{ url_for('books.detail', book_id=entry.book.id) }}">
+                    {{ entry.book.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p class="text-muted">You haven't marked any books as read.</p>
+{% endif %}
+
         </div>
       </div>
     </div>
@@ -40,7 +66,20 @@ book lists.-->
       <div class="card text-white bg-dark">
         <div class="card-header">Top 5</div>
         <div class="card-body">
-          <!--put links to books in here-->
+          {% if top_five_books %}
+    <ol class="list-unstyled">
+        {% for entry in top_five_books %}
+            <li>
+                <a class="text-light" href="{{ url_for('books.detail', book_id=entry.book.id) }}">
+                    {{ entry.top_five }}. {{ entry.book.title }}
+                </a>
+            </li>
+        {% endfor %}
+    </ol>
+{% else %}
+    <p class="text-muted">No top‑five books yet.</p>
+{% endif %}
+
         </div>
       </div>
     </div>
