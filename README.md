@@ -8,5 +8,8 @@ How to run the app (development server):
     - set FLASK_ENV=development
     - flask run
 
-Use to make sure database schema is up-to-date:
+Use to make sure database schema is up-to-date:  
     - flask db upgrade
+
+To populate the Books table:  
+    - python scripts/load_books.py
