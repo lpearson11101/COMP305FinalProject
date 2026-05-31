@@ -50,7 +50,7 @@ class UserBook(db.Model):
     #UserBookPersona relationship. If a user-book interaction is deleted, all associated personas are also deleted.
     personas = db.relationship(
     "UserBookPersona",
-    back_populates="userbook",
+    back_populates="UserBook",
     cascade="all, delete-orphan"
     )
     #a user can only have one user-book interaction per book, so we set a unique constraint on the combination of user_id and book_id
