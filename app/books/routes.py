@@ -44,7 +44,7 @@ def search():
 
     search_pattern = f'%{query}%'
     results = Book.query.filter(
-        or_(Book.title.ilike(search_pattern), Book.summary.ilike(search_pattern))
+        or_(Book.title.ilike(search_pattern), Book.author.ilike(search_pattern))
     ).order_by(Book.isbn.desc()).limit(20).all()
 
     return render_template('books/search_results.html', results=results, query=query)
