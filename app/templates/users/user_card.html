@@ -4,8 +4,9 @@
 <div class="card text-white bg-dark">
         <div class="username">{{ user.username }}</div>
         <div class="user details">
-        
+        <!--this might not work, let me know if it doesn't-->
           <a
+            
               href="{{ url_for('users.detail', user_id=user.id) }}"
               class="btn btn-success btn-md me-2"
           >
