@@ -1,4 +1,6 @@
 # Comment model
+from datetime import datetime
+
 from app.extensions import db
 
 class Comment(db.Model):
@@ -20,7 +22,14 @@ class Comment(db.Model):
     book_id = db.Column(
         db.Integer,
         db.ForeignKey("books.id"),
-        nullable=False
+        nullable=False,
+        index=True
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now(),
+        index=True
     )
 
     #whether or not the comment was left by the author of the book. True or False check.

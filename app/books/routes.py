@@ -1,11 +1,15 @@
-from flask import render_template, request, url_for, redirect
+from flask import flash, render_template, request, url_for, redirect, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_, func
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app.books import bp
+from app.forms.comment_form import CommentForm
 from app.models.book import Book
 from app.models.userbook import UserBook
+from app.models.comment import Comment
+from sqlalchemy.orm import joinedload
 from app.extensions import db
+from app.services.covers import ensure_cover_cached
 
 
 @bp.route('/', methods=('GET', 'POST'))
@@ -49,10 +53,39 @@ def search():
 
     return render_template('books/search_results.html', results=results, query=query)
 
-@bp.route('/<int:book_id>')
+#Book detail page. Loads/renders the book and its comments. Handles comment submission
+@bp.route('/books/<int:book_id>', methods=['GET', 'POST'])
 def detail(book_id):
-    book = Book.query.get_or_404(book_id)
-    return render_template('books/detail.html', book=book)
+    book = Book.query.options(
+        joinedload(Book.comments).joinedload(Comment.user)
+    ).get_or_404(book_id)
+
+    # Cover fetch only runs when page is visited
+    cover_path = None
+    if book.cover_id:
+        cover_path = ensure_cover_cached(book.cover_id)
+
+    #comments form
+    form = CommentForm()
+
+    if form.validate_on_submit():
+        if not current_user.is_authenticated:
+            flash("You must be logged in to comment.")
+            return redirect(url_for("auth.login"))
+
+        comment = Comment(
+            content=form.body.data,
+            user=current_user,
+            book=book
+        )
+
+        db.session.add(comment)
+        db.session.commit()
+
+        flash("Comment posted.", "success")
+        return redirect(url_for("books.detail", book_id=book.id))
+
+    return render_template('books/detail.html', book=book, form=form, cover_path=cover_path)
 
 @bp.route('/rate_aura/<int:book_id>', methods=['POST'])
 def rate_aura(book_id):
@@ -212,3 +245,59 @@ def top_five_down(book_id):
         db.session.commit()
 
     return redirect(url_for('users.profile'))
+
+#route for editing comments
+@bp.route("/comments/<int:comment_id>/edit", methods=["GET", "POST"])
+@login_required
+def edit_comment(comment_id):
+
+    comment = Comment.query.get_or_404(comment_id)
+
+    #don't allow users to edit other users' comments
+    if comment.user_id != current_user.id:
+        abort(403)
+
+    form = CommentForm(obj=comment)
+
+    #add the existing comment content to the form on GET so it shows up in the textarea for editing
+    if request.method == "GET":
+        form.body.data = comment.content
+
+
+    if form.validate_on_submit():
+        comment.content = form.body.data
+
+        db.session.commit()
+
+        flash("Comment updated.", "success")
+
+        return redirect(
+            url_for("books.detail", book_id=comment.book_id)
+        )
+
+    return render_template(
+        "edit_comment.html",
+        form=form,
+        comment=comment
+    )
+
+#route for deleting comments
+@bp.route("/comments/<int:comment_id>/delete", methods=["POST"])
+@login_required
+def delete_comment(comment_id):
+
+    comment = Comment.query.get_or_404(comment_id)
+
+    if comment.user_id != current_user.id:
+        abort(403)
+
+    book_id = comment.book_id
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    flash("Comment deleted.", "success")
+
+    return redirect(
+        url_for("books.detail", book_id=book_id)
+    )

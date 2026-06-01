@@ -64,7 +64,8 @@ class Book(db.Model):
     comments = db.relationship(
         "Comment",
         back_populates="book",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        order_by="Comment.created_at.desc()"
     )
 
     book_persona_aggregates = db.relationship(

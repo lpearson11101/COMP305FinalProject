@@ -6,3 +6,6 @@ app.db
 instance/
 data/*.gz
 data/*.txt
+
+app/static/covers/*.jpg
+!app/static/covers/default.jpg
