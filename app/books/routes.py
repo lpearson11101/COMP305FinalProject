@@ -108,13 +108,49 @@ def mark_to_read(book_id):
 @bp.route('/add_top_five/<int:book_id>', methods=['POST'])
 def add_top_five(book_id):
     user_id = current_user.id
+
     entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
     if not entry:
         entry = UserBook(user_id=user_id, book_id=book_id)
         db.session.add(entry)
-    entry.top_five = 1  # placeholder rank
+
+    # Find current max rank
+    current_ranks = UserBook.query.filter(
+        UserBook.user_id == user_id,
+        UserBook.top_five.isnot(None)
+    ).order_by(UserBook.top_five.asc()).all()
+
+    # If already in top five, do nothing
+    if entry.top_five:
+        return redirect(url_for('books.detail', book_id=book_id))
+
+    # If full, do nothing
+    if len(current_ranks) >= 5:
+        return redirect(url_for('books.detail', book_id=book_id))
+
+    # Assign next available rank
+    used_ranks = {e.top_five for e in current_ranks}
+    for rank in range(1, 6):
+        if rank not in used_ranks:
+            entry.top_five = rank
+            break
+
     db.session.commit()
+    fix_top_five(user_id)
+
     return redirect(url_for('books.detail', book_id=book_id))
+
+def fix_top_five(user_id):
+    entries = UserBook.query.filter(
+        UserBook.user_id == user_id,
+        UserBook.top_five.isnot(None)
+    ).order_by(UserBook.top_five.asc()).all()
+
+    # Reassign ranks so th buttons work
+    for i, entry in enumerate(entries, start=1):
+        entry.top_five = i
+
+    db.session.commit()
 
 @bp.route('/unmark_read/<int:book_id>', methods=['POST'])
 def unmark_read(book_id):
@@ -143,6 +179,8 @@ def remove_top_five(book_id):
     if entry:
         entry.top_five = None
         db.session.commit()
+        fix_top_five(user_id)
+    
     return redirect(url_for('users.profile'))
 
 @bp.route('/admin/edit/<int:book_id>')
@@ -197,22 +235,35 @@ def top_five_up(book_id):
             above.top_five += 1
         entry.top_five -= 1
         db.session.commit()
-
+        fix_top_five(user_id)
     return redirect(url_for('users.profile'))
 
 
 @bp.route('/top_five_down/<int:book_id>', methods=['POST'])
 def top_five_down(book_id):
     user_id = current_user.id
+
     entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
 
-    if entry and entry.top_five and entry.top_five < 5:
-        # Find the book currently below this one
-        below = UserBook.query.filter_by(user_id=user_id, top_five=entry.top_five + 1).first()
-        if below:
-            below.top_five -= 1
-        entry.top_five += 1
+    if not entry or entry.top_five is None:
+        return redirect(url_for('books.top_five'))
+
+    # Swap with the entry below it
+    lower_entry = UserBook.query.filter_by(
+        user_id=user_id,
+        top_five=entry.top_five + 1
+    ).first()
+
+    if lower_entry:
+        # Swap ranks
+        entry.top_five, lower_entry.top_five = (
+            lower_entry.top_five,
+            entry.top_five
+        )
         db.session.commit()
+        fix_top_five(user_id)
+
+    return redirect(url_for('users.profile'))
 
 @bp.route('/admin/add', methods=['GET', 'POST'])
 def admin_add_book():
@@ -220,23 +271,24 @@ def admin_add_book():
         new_book = Book(
             title=request.form['title'],
             author=request.form['author'],
-            publisher=request.form['publisher'], 
+            publisher=request.form['publisher'],
             isbn=request.form.get('isbn'),
-            cover_id=None,  # Can add later
+            cover_id=None,
             summary=request.form.get('summary'),
             year_published=request.form.get('year_published'),
             genre=request.form.get('genre'),
             length=request.form.get('length'),
             agg_enjoyment=0.0,
             agg_aura=0.0,
+            persona_one=request.form.get('persona_one')
         )
-
         db.session.add(new_book)
         db.session.commit()
+        return redirect(url_for('books.admin_page'))
 
-        return redirect(url_for('books.admin_dashboard'))
+    personas = Persona.query.all()
+    return render_template('books/admin_add.html', personas=personas)
 
-    return render_template('books/admin_add.html')
 
 
 @bp.route('/admin/delete/<int:book_id>', methods=['POST'])
