@@ -30,6 +30,11 @@
             <input type="text" name="isbn" class="form-control">
         </div>
 
+        <!-- <div class="mb-3">
+            <label class="form-label">Cover ID</label>
+            <input type="int" name="cover_id" class="form-control">
+        </div> -->
+
         <div class="mb-3">
             <label class="form-label">Year Published</label>
             <input type="number" name="year_published" class="form-control">
@@ -48,6 +53,16 @@
         <div class="mb-3">
             <label class="form-label">Summary</label>
             <textarea name="summary" class="form-control" rows="4"></textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Persona One</label>
+            <select name="persona_one" class="form-select">
+                <option value="">-- Select Persona --</option>
+                {% for persona in personas %}
+                    <option value="{{ persona.name }}">{{ persona.name }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <button class="btn btn-primary">Add Book</button>
