@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }}{% endblock %}
+
+{% block content %}
+<h1>{{ user.username }}</h1>
+
+<h3 class="mt-4">Top 5</h3>
+<ul>
+    {% for entry in top_five %}
+        <li>{{ entry.top_five }}. {{ entry.book.title }}</li>
+    {% endfor %}
+</ul>
+
+<h3 class="mt-4">To‑Read</h3>
+<ul>
+    {% for entry in to_read %}
+        <li>{{ entry.book.title }}</li>
+    {% endfor %}
+</ul>
+
+<h3 class="mt-4">Read</h3>
+<ul>
+    {% for entry in read %}
+        <li>{{ entry.book.title }}</li>
+        <h3 class="mt-4">Personas</h3>
+<ul>
+        {% for persona in entry.personas %}
+            <li>{{ entry.book.title }} — {{ p.persona }}</li>
+        {% endfor %}
+</ul>
+
+    {% endfor %}
+</ul>
+
+<h3 class="mt-4">Personas</h3>
+<ul>
+    {% for entry in read %}
+        {% for p in entry.personas %}
+            <li>{{ entry.book.title }} — {{ p.persona.name }} (Rank {{ p.ranking }})</li>
+        {% endfor %}
+    {% endfor %}
+</ul>
+
+
+{% endblock %}
