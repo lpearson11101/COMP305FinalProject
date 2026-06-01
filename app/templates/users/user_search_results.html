@@ -8,9 +8,13 @@
 
 {% for user in results %}
 
-    <div class="books">
+    <div class="users">
 
         <h3>{{ user.username }}</h3>
+        <a href="{{ url_for('users.user_details', user_id=user.id) }}">
+            {{ user.username }}
+        </a>
+
 
     </div>
 
