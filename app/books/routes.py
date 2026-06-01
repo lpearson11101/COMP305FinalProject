@@ -5,7 +5,9 @@ from flask_login import current_user
 from app.books import bp
 from app.models.book import Book
 from app.models.userbook import UserBook
+from app.models.persona import Persona
 from app.extensions import db
+from app.models.userbookpersona import UserBookPersona
 
 
 @bp.route('/', methods=('GET', 'POST'))
@@ -52,7 +54,8 @@ def search():
 @bp.route('/<int:book_id>')
 def detail(book_id):
     book = Book.query.get_or_404(book_id)
-    return render_template('books/detail.html', book=book)
+    personas = Persona.query.all()
+    return render_template('books/detail.html', book=book, personas=personas)
 
 @bp.route('/rate_aura/<int:book_id>', methods=['POST'])
 def rate_aura(book_id):
@@ -211,4 +214,65 @@ def top_five_down(book_id):
         entry.top_five += 1
         db.session.commit()
 
-    return redirect(url_for('users.profile'))
+@bp.route('/admin/add', methods=['GET', 'POST'])
+def admin_add_book():
+    if request.method == 'POST':
+        new_book = Book(
+            title=request.form['title'],
+            author=request.form['author'],
+            publisher=request.form['publisher'], 
+            isbn=request.form.get('isbn'),
+            cover_id=None,  # Can add later
+            summary=request.form.get('summary'),
+            year_published=request.form.get('year_published'),
+            genre=request.form.get('genre'),
+            length=request.form.get('length'),
+            agg_enjoyment=0.0,
+            agg_aura=0.0,
+        )
+
+        db.session.add(new_book)
+        db.session.commit()
+
+        return redirect(url_for('books.admin_dashboard'))
+
+    return render_template('books/admin_add.html')
+
+
+@bp.route('/admin/delete/<int:book_id>', methods=['POST'])
+def admin_delete_book(book_id):
+    if current_user.role != 'admin':
+        return "You're not fancy enough", 403
+
+    book = Book.query.get_or_404(book_id)
+    db.session.delete(book)
+    db.session.commit()
+    return redirect(url_for('books.search'))
+
+@bp.route('/set_personas/<int:book_id>', methods=['POST'])
+def set_personas(book_id):
+    user_id = current_user.id
+
+    # Get or create UserBook entry
+    entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
+    if not entry:
+        entry = UserBook(user_id=user_id, book_id=book_id)
+        db.session.add(entry)
+        db.session.commit()
+
+    # Clear old personas
+    entry.personas.clear()
+
+    # Add new personas
+    for i in range(1, 4):
+        persona_id = request.form.get(f"persona_{i}")
+        if persona_id:  # skip empty dropdowns
+            persona = UserBookPersona(
+                persona_id=int(persona_id),
+                userbook_id=entry.id,
+                ranking=i
+            )
+            db.session.add(persona)
+
+    db.session.commit()
+    return redirect(url_for('books.detail', book_id=book_id))

@@ -42,3 +42,20 @@ def search():
     ).order_by(User.username.desc()).limit(20).all()
 
     return render_template('users/user_search_results.html', results=results, query=query)
+
+@bp.route('/user/<int:user_id>')
+def user_details(user_id):
+    user = User.query.get_or_404(user_id)
+
+    top_five = UserBook.query.filter_by(user_id=user_id)\
+                             .filter(UserBook.top_five.isnot(None))\
+                             .order_by(UserBook.top_five.asc()).all()
+
+    to_read = UserBook.query.filter_by(user_id=user_id, to_read=True).all()
+    read = UserBook.query.filter_by(user_id=user_id, mark_read=True).all()
+
+    return render_template('users/user_details.html',
+                           user=user,
+                           top_five=top_five,
+                           to_read=to_read,
+                           read=read)
