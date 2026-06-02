@@ -50,6 +50,14 @@ def download_cover(cover_id: int) -> bool:
     except requests.RequestException:
         return False
 
+    #just in case of filesystem permission issues, we don't want to crash the app
+    except PermissionError:
+        try:
+            if tmp_path.exists():
+                tmp_path.unlink()
+        except Exception:
+            pass
+        return False
 
 def ensure_cover_cached(cover_id: int) -> str | None:
     if not cover_id:

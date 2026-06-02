@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import flash, render_template, request, url_for, redirect, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_, func
@@ -13,7 +15,8 @@ from app.extensions import db
 from app.services.covers import ensure_cover_cached
 from app.models.persona import Persona
 from app.models.userbookpersona import UserBookPersona
-
+from app.models.bookpersonaaggregate import BookPersonaAggregate
+from app.services.persona_scoring import recalculate_book_personas
 
 @bp.route('/', methods=('GET', 'POST'))
 def index():
@@ -43,6 +46,9 @@ def index():
 def books():
     return render_template('books/search.html')
 
+
+#route to search for books by title or author. Uses ilike for case-insensitive partial matching. 
+#Limits results to 20. Also attaches cover_path to each book for display in results.
 @bp.route('/search')
 def search():
     query = request.args.get('q', '').strip()
@@ -54,7 +60,23 @@ def search():
         or_(Book.title.ilike(search_pattern), Book.author.ilike(search_pattern))
     ).order_by(Book.isbn.desc()).limit(20).all()
 
-    return render_template('books/search_results.html', results=results, query=query)
+    # Attach cover_path like detail() does
+    for book in results:
+        if book.cover_id:
+            cover_file = f"covers/{book.cover_id}.jpg"
+            full_path = Path("app/static") / cover_file
+            if full_path.exists():
+                book.cover_path = cover_file
+            else:
+                book.cover_path = "covers/default.jpg"
+        else:
+            book.cover_path = "covers/default.jpg"
+
+    return render_template(
+        'books/search_results.html',
+        results=results,
+        query=query
+    )
 
 #Book detail page. Loads/renders the book and its comments. Handles comment submission
 @bp.route('/books/<int:book_id>', methods=['GET', 'POST'])
@@ -90,8 +112,30 @@ def detail(book_id):
 
         flash("Comment posted.", "success")
         return redirect(url_for("books.detail", book_id=book.id))
+    
+    #get top personas for this book
+    top_personas = (
+        BookPersonaAggregate.query
+        .filter_by(book_id=book.id)
+        .join(Persona)
+        .order_by(BookPersonaAggregate.score.desc())
+        .limit(3)
+        .all()
+    )
 
-    return render_template('books/detail.html', book=book, personas= personas, form=form, cover_path=cover_path)
+    current_personas = {}
+
+    if current_user.is_authenticated:
+        userbook = UserBook.query.filter_by(
+            user_id=current_user.id,
+            book_id=book.id
+        ).first()
+
+        if userbook:
+            for p in userbook.personas:
+                current_personas[p.ranking] = p.persona_id
+
+    return render_template('books/detail.html', book=book, personas= personas, top_personas=top_personas, current_personas=current_personas, form=form, cover_path=cover_path)
 
 #route for rating aura. Updates or creates a UserBook entry for the user and book, then updates the book's average ratings.
 @bp.route('/rate_aura/<int:book_id>', methods=['POST'])
@@ -424,7 +468,6 @@ def admin_add_book():
             length=request.form.get('length'),
             agg_enjoyment=0.0,
             agg_aura=0.0,
-            persona_one=request.form.get('persona_one')
         )
         db.session.add(new_book)
         try:
@@ -448,6 +491,8 @@ def admin_delete_book(book_id):
     db.session.commit()
     return redirect(url_for('books.search'))
 
+
+#persona selection route. Updates the user's persona rankings for the book, then recalculates the book's aggregate persona scores.
 @bp.route('/set_personas/<int:book_id>', methods=['POST'])
 @login_required
 def set_personas(book_id):
@@ -458,21 +503,53 @@ def set_personas(book_id):
     if not entry:
         entry = UserBook(user_id=user_id, book_id=book_id)
         db.session.add(entry)
-        db.session.commit()
+        db.session.flush()
 
     # Clear old personas
     entry.personas.clear()
+    db.session.flush()
 
-    # Add new personas
+    # Add new personas. Prevent duplicates
+    selected = set()
+
     for i in range(1, 4):
         persona_id = request.form.get(f"persona_{i}")
-        if persona_id:  # skip empty dropdowns
-            persona = UserBookPersona(
+
+        if not persona_id:
+            continue
+
+        if persona_id in selected:
+            flash(
+                "You cannot select the same persona more than once.",
+                "danger"
+            )
+            return redirect(
+                url_for('books.detail', book_id=book_id)
+            )
+
+        selected.add(persona_id)
+
+        db.session.add(
+            UserBookPersona(
                 persona_id=int(persona_id),
                 userbook_id=entry.id,
                 ranking=i
             )
-            db.session.add(persona)
+        )
+
+    if not selected:
+        flash(
+            "Please select at least one persona.",
+            "danger"
+        )
+        return redirect(
+            url_for('books.detail', book_id=book_id)
+        )
 
     db.session.commit()
+
+    #recalculate aggregate persona scores for the book
+    recalculate_book_personas(book_id)
+    flash("Personas updated.", "success")
+
     return redirect(url_for('books.detail', book_id=book_id))

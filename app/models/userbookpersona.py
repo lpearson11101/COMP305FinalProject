@@ -34,3 +34,15 @@ class UserBookPersona(db.Model):
         "Persona",
         back_populates="user_book_personas"
     )
+
+    #unique constraint to ensure that a user-book interaction can only have one of each persona
+    __table_args__ = (
+        db.UniqueConstraint('userbook_id', 'persona_id', name='unique_userbook_persona'),
+    )
+
+    #unique constraint to ensure that a user-book interaction can only have one persona with a given ranking (can't have two personas both ranked 1)
+    db.UniqueConstraint(
+        "userbook_id",
+        "ranking",
+        name="unique_rank_per_userbook"
+    )
