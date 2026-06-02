@@ -1,6 +1,7 @@
 from flask import flash, render_template, request, url_for, redirect, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import or_, func
+from sqlalchemy.exc import IntegrityError
 from flask_login import current_user, login_required
 from app.books import bp
 from app.forms.comment_form import CommentForm
@@ -93,6 +94,7 @@ def detail(book_id):
     return render_template('books/detail.html', book=book, personas= personas, form=form, cover_path=cover_path)
 
 @bp.route('/rate_aura/<int:book_id>', methods=['POST'])
+@login_required
 def rate_aura(book_id):
     rating = float(request.form.get('aura'))
     user_id = current_user.id
@@ -106,6 +108,7 @@ def rate_aura(book_id):
     return redirect(url_for('books.detail', book_id=book_id))
 
 @bp.route('/rate_enjoyment/<int:book_id>', methods=['POST'])
+@login_required
 def rate_enjoyment(book_id):
     rating = float(request.form.get('enjoyment'))
     user_id = current_user.id
@@ -119,6 +122,7 @@ def rate_enjoyment(book_id):
     return redirect(url_for('books.detail', book_id=book_id))
 
 @bp.route('/mark_read/<int:book_id>', methods=['POST'])
+@login_required
 def mark_read(book_id):
     user_id = current_user.id
     entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
@@ -130,6 +134,7 @@ def mark_read(book_id):
     return redirect(url_for('books.detail', book_id=book_id))
 
 @bp.route('/mark_to_read/<int:book_id>', methods=['POST'])
+@login_required
 def mark_to_read(book_id):
     user_id = current_user.id
     entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
@@ -141,6 +146,7 @@ def mark_to_read(book_id):
     return redirect(url_for('books.detail', book_id=book_id))
 
 @bp.route('/add_top_five/<int:book_id>', methods=['POST'])
+@login_required
 def add_top_five(book_id):
     user_id = current_user.id
 
@@ -188,6 +194,7 @@ def fix_top_five(user_id):
     db.session.commit()
 
 @bp.route('/unmark_read/<int:book_id>', methods=['POST'])
+@login_required
 def unmark_read(book_id):
     user_id = current_user.id
     entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
@@ -259,6 +266,7 @@ def update_book_averages(book_id):
     db.session.commit()
 
 @bp.route('/top_five_up/<int:book_id>', methods=['POST'])
+@login_required
 def top_five_up(book_id):
     user_id = current_user.id
     entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
@@ -275,6 +283,7 @@ def top_five_up(book_id):
 
 
 @bp.route('/top_five_down/<int:book_id>', methods=['POST'])
+@login_required
 def top_five_down(book_id):
     user_id = current_user.id
 
@@ -357,12 +366,27 @@ def delete_comment(comment_id):
     )
 @bp.route('/admin/add', methods=['GET', 'POST'])
 def admin_add_book():
+    personas = Persona.query.all()
     if request.method == 'POST':
+        isbn = request.form.get('isbn')
+
+        if isbn == "":
+            isbn = None
+        # Normalize ISBN 
+        elif isbn:
+            isbn = isbn.strip()
+
+
+        # Check isbn is unique before inserting
+        existing_isbn = Book.query.filter_by(isbn=isbn).first()
+        if isbn and existing_isbn:
+            return render_template("books/admin_add.html", error="ISBN already exists", personas=personas)
+        
         new_book = Book(
             title=request.form['title'],
             author=request.form['author'],
             publisher=request.form['publisher'],
-            isbn=request.form.get('isbn'),
+            isbn=isbn,
             cover_id=None,
             summary=request.form.get('summary'),
             year_published=request.form.get('year_published'),
@@ -373,10 +397,13 @@ def admin_add_book():
             persona_one=request.form.get('persona_one')
         )
         db.session.add(new_book)
-        db.session.commit()
-        return redirect(url_for('books.admin_page'))
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return render_template("books/admin_add.html", error="ISBN already exists", personas=personas)
+        return redirect(url_for('books.detail', book_id=new_book.id))
 
-    personas = Persona.query.all()
     return render_template('books/admin_add.html', personas=personas)
 
 
@@ -392,6 +419,7 @@ def admin_delete_book(book_id):
     return redirect(url_for('books.search'))
 
 @bp.route('/set_personas/<int:book_id>', methods=['POST'])
+@login_required
 def set_personas(book_id):
     user_id = current_user.id
 
