@@ -13,3 +13,9 @@ Use to make sure database schema is up-to-date:
 
 To populate the Books table:  
     - python scripts/load_books.py
+
+To populate the Users table:  
+    - python scripts/seed_users.py
+
+To populate the persona table:  
+    - python scripts/fill_personas.py

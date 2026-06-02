@@ -39,14 +39,14 @@ class Book(db.Model):
     # The aggregated aura rating
     agg_aura = db.Column(db.Float, nullable=False)
 
-    # The first "persona" assigned to a book, cannot be null
-    persona_one = db.Column(db.String(250))
+    # The first "persona" assigned to a book, can be null
+    persona_one = db.Column(db.String(250), default=None)
 
     # The second "persona" assigned to a book
-    persona_two = db.Column(db.String(250))
+    persona_two = db.Column(db.String(250), default=None)
     
     # The third "persona" assigned to a book
-    persona_three = db.Column(db.String(250))
+    persona_three = db.Column(db.String(250), default=None)
 
     #User-book relationship. If a book is deleted, all user-book interactions with that book are also deleted.
     user_books = db.relationship(
@@ -64,7 +64,8 @@ class Book(db.Model):
     comments = db.relationship(
         "Comment",
         back_populates="book",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        order_by="Comment.created_at.desc()"
     )
 
     book_persona_aggregates = db.relationship(

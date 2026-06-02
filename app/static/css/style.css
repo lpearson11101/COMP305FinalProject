@@ -1,0 +1,29 @@
+
+.book-cover-large {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+.book-cover-medium {
+    width: 100%;
+    max-width: 180px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+.book-cover-small {
+    width: 100%;
+    max-width: 100px;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+}
+
+.book-card {
+    transition: transform 0.2s ease;
+}
+
+.book-card:hover {
+    transform: scale(1.02);
+}

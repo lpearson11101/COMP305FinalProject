@@ -9,6 +9,25 @@
     <p class="text-muted">Welcome to your profile.</p>
 </div>
 
+<!-- TOP THREE PERSONAS -->
+
+<div class="mt-5">
+    <h2>Top Three Personas</h2>
+    {% if top_three_personas %}
+      <ul class="list-unstyled">
+        {% for aggregate in top_three_personas %}
+            <li class="mb-2">
+                <strong>{{ aggregate.persona.name }}</strong> - {{ aggregate.score|int }} pts
+            </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No personas calculated yet. Add books to your Top 5 to see your personas.</p>
+    {% endif %}
+</div>
+
+<!-- BOOK LISTS -->
+
 <div class="mt-5 container">
   <div class="row">
 
@@ -130,12 +149,6 @@
     </div>
 
   </div>
-</div>
-<div class="mt-5 text-center">
-  <h3>Persona List</h3>
-  <button class="btn btn-info mt-3" disabled>
-      Calculate Top Persona (W.I.P)
-  </button>
 </div>
 
 {% endblock %}

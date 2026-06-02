@@ -2,53 +2,62 @@
 
 {% block content %}
 
-<div class="text-center">
-
+<div class="text-center mb-4">
     <h1>Search Results</h1>
-
     <p>You searched for: {{ query }}</p>
-
 </div>
 
-{% for book in results %}
+<div class="row g-4">
+    {% for book in results %}
+        <div class="col-12 col-md-6 col-lg-4">
 
-    <div class="books">
-        <a href="{{ url_for('books.detail', book_id=book.id) }}">
-            <h3>{{ book.title }}</h3>
-        {% if current_user.role == 'admin' %}
-        <form action="{{ url_for('books.admin_delete_book', book_id=book.id) }}"
-        method="POST" style="display:inline;">
-        <button class="btn btn-danger btn-sm"
-        onclick="return confirm('Are you sure you want to delete this book? This cannot be undone.');">
-    Delete
-</button>
+            <div class="card text-white bg-dark h-100 shadow-sm book-card">
 
-        </form>
+                <div class="card-body text-center">
 
-{% endif %}
+                    <h5 class="card-title">
+                        {{ book.title }}
+                    </h5>
 
+                    <img
+                        src="{{ url_for('static', filename=book.cover_path) }}"
+                        alt="{{ book.title }} cover"
+                        class="book-cover-medium mb-3"
+                    />
 
-        
-    </div>
-    <div class="d-flex justify-content-center">
-        <div class="card text-white bg-dark mb-3" >
-            <div class="book title">{{ book.title }}</div>
-                <div class="book image and details">
-        
-                {% if book.cover_id %}
-                <img src="{{ url_for('static', filename='covers/' ~ book.cover_id ~ '.jpg') }}"
-                                    alt="{{ book.title }} cover" class="img-fluid mb-3" >
-                {% endif %}
-            
-                <a
-                    href="{{ url_for('books.detail', book_id=book.id) }}"
-                    class="btn btn-success btn-md me-2"
-                >
-                    go to book
-                </a>
+                    <a
+                        href="{{ url_for('books.detail', book_id=book.id) }}"
+                        class="btn btn-success btn-sm w-100 mb-2"
+                    >
+                        Go to book
+                    </a>
+
+                    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                        <form
+                            action="{{ url_for('books.admin_delete_book', book_id=book.id) }}"
+                            method="POST"
+                        >
+                            <button
+                                class="btn btn-danger btn-sm w-100"
+                                onclick="return confirm('Are you sure you want to delete this book? This cannot be undone.');"
+                            >
+                                Delete
+                            </button>
+                        </form>
+                    {% endif %}
+
                 </div>
             </div>
+
         </div>
+    {% endfor %}
+</div>
+
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
+    <div class="text-center mt-4">
+        <a href="{{ url_for('books.admin_add_book') }}" class="btn btn-warning">
+            Add New Book
+        </a>
     </div>
     <div class="card text-white bg-dark">
         <div class="book title">{{ book.title }}</div>
@@ -75,8 +84,5 @@
         Add New Book
     </a>
 {% endif %}
-
-
-
 
 {% endblock %}

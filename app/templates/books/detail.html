@@ -1,109 +1,231 @@
 {% extends 'base.html' %}
+
 {% block content %}
 
 <div class="container mt-4">
-    <div class="row">
 
-        <div class="col-8">
+    <!-- display flash messages for success or error feedback on actions like rating, marking read, etc. -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+    <div class="row gy-4">
 
-            <div class="row">
-                <div class="col-6">
-                    {% if book.cover_id %}
-                        <img src="{{ url_for('static', filename='covers/' ~ book.cover_id ~ '.jpg') }}"
-                             alt="{{ book.title }} cover"
-                             class="img-fluid mb-3">
+        <!-- LEFT COLUMN FOR BOOK DETAILS, RATINGS, AND PERSONAS -->
+        <div class="col-12 col-lg-8">
+
+            <!-- Book Details -->
+            <div class="row gy-4">
+
+                <div class="col-12 col-md-5 text-center">
+
+                    {% if cover_path %}
+                        <img
+                            src="{{ url_for('static', filename=cover_path) }}"
+                            alt="{{ book.title }} cover"
+                            class="book-cover-large mb-3">
+                    {% else %}
+                        <img
+                            src="{{ url_for('static', filename='covers/default.jpg') }}"
+                            alt="{{ book.title }} cover"
+                            class="book-cover-large mb-3">
                     {% endif %}
+
                 </div>
 
-                <div class="col-6">
+                <div class="col-12 col-md-7">
+
                     <h2>{{ book.title }}</h2>
+
                     <p><strong>Author:</strong> {{ book.author }}</p>
                     <p><strong>Genre:</strong> {{ book.genre }}</p>
 
                     <p><strong>A.U.R.A. Rating:</strong> {{ book.agg_aura }}</p>
                     <p><strong>Enjoyment Rating:</strong> {{ book.agg_enjoyment }}</p>
 
-                    <form action="{{ url_for('books.rate_aura', book_id=book.id) }}" method="post" class="mb-2">
-                        <label for="aura">What's the A.U.R.A of this book?</label>
-                        <input type="number" name="aura" id="aura" min="0" max="5" step="1"
-                               class="form-control w-50">
-                        <button type="submit" class="btn btn-primary mt-1">Submit A.U.R.A.</button>
+                    <!-- Top Personas -->
+                     <div class="mt-4">
+
+                        <h5>Top Book Personas</h5>
+
+                        {% if top_personas %}
+
+                            <ol class="list-group list-group-numbered">
+
+                                {% for aggregate in top_personas %}
+
+                                    <li class="list-group-item d-flex justify-content-between">
+
+                                        <span>
+                                            {{ aggregate.persona.name if aggregate.persona else "Unknown Persona" }}
+                                        </span>
+
+                                        <span class="badge bg-primary">
+                                            {{ aggregate.score|int }} pts
+                                        </span>
+
+                                    </li>
+
+                                {% endfor %}
+
+                            </ol>
+
+                        {% else %}
+
+                            <p class="text-muted">
+                                No persona rankings yet.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                    <!-- Ratings -->
+                    <form action="{{ url_for('books.rate_aura', book_id=book.id) }}" method="post" class="mb-3">
+                        <label class="form-label">A.U.R.A</label>
+                        <input type="number" name="aura" min="0" max="5" step="1" class="form-control w-50">
+                        <button type="submit" class="btn btn-primary mt-1">Submit</button>
                     </form>
 
-                    <form action="{{ url_for('books.rate_enjoyment', book_id=book.id) }}" method="post">
-                        <label for="enjoyment">How good is it (out of 5)?</label>
-                        <input type="number" name="enjoyment" id="enjoyment" min="0" max="5" step="1"
-                               class="form-control w-50">
-                        <button type="submit" class="btn btn-primary mt-1">Submit Enjoyment</button>
+                    <form action="{{ url_for('books.rate_enjoyment', book_id=book.id) }}" method="post" class="mb-3">
+                        <label class="form-label">Enjoyment</label>
+                        <input type="number" name="enjoyment" min="0" max="5" step="1" class="form-control w-50">
+                        <button type="submit" class="btn btn-primary mt-1">Submit</button>
                     </form>
+
                 </div>
             </div>
 
-            <div class="mt-4">
-                <div class="row text-center">
+            <!-- Interaction Buttons -->
+            <div class="mt-4 row g-2 text-center">
 
-                    <div class="col-4">
-                        <form action="{{ url_for('books.mark_read', book_id=book.id) }}" method="post">
-                            <button type="submit" class="btn btn-secondary w-100">Mark as Read</button>
-                        </form>
-                    </div>
-
-                    <div class="col-4">
-                        <form action="{{ url_for('books.mark_to_read', book_id=book.id) }}" method="post">
-                            <button type="submit" class="btn btn-success w-100">Add to "To‑Read"</button>
-                        </form>
-                    </div>
-
-                    <div class="col-4">
-                        <form action="{{ url_for('books.add_top_five', book_id=book.id) }}" method="post">
-                            <button type="submit" class="btn btn-warning w-100">Add to "Top‑Five"</button>
-                        </form>
-                    </div>
-
+                <div class="col-12 col-md-4">
+                    <form action="{{ url_for('books.mark_read', book_id=book.id) }}" method="post">
+                        <button class="btn btn-secondary w-100">Mark Read</button>
+                    </form>
                 </div>
 
-                <div class="row text-center mt-2">
+                <div class="col-12 col-md-4">
+                    <form action="{{ url_for('books.mark_to_read', book_id=book.id) }}" method="post">
+                        <button class="btn btn-success w-100">To Read</button>
+                    </form>
+                </div>
 
-            {% if current_user.role == 'admin' %}
-            <a href="{{ url_for('books.admin_page', book_id=book.id) }}" 
-            class="btn btn-danger mt-3">
-                Edit Book Details
-            </a>
+                <div class="col-12 col-md-4">
+                    <form action="{{ url_for('books.add_top_five', book_id=book.id) }}" method="post">
+                        <button class="btn btn-warning w-100">Top Five</button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Admin and Summary -->
+            <div class="mt-4">
+
+                {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                    <a href="{{ url_for('books.admin_page', book_id=book.id) }}"
+                       class="btn btn-danger mb-3">
+                        Edit Book Details
+                    </a>
+                {% endif %}
+
+                <h5>Summary</h5>
+                <p>{{ book.summary }}</p>
+
+                <hr>
+            </div>
+
+            <!-- Personas -->
+            <div class="mt-4">
+
+                <h5>What personas fit this book best?</h5>
+
+                <form action="{{ url_for('books.set_personas', book_id=book.id) }}" method="POST">
+
+                    {% for i in range(1, 4) %}
+                        <label class="form-label">
+                            Persona #{{ i }}
+                            {% if i == 1 %}
+                                (Most Important)
+                            {% elif i == 2 %}
+                                (Second)
+                            {% else %}
+                                (Third)
+                            {% endif %}
+                        </label>
+
+                        <select name="persona_{{ i }}" class="form-select mb-2">
+                            <option value="">-- Select Persona --</option>
+
+                            {% for p in personas %}
+                                <option
+                                    value="{{ p.id }}"
+                                    {% if current_personas.get(i) == p.id %}
+                                        selected
+                                    {% endif %}
+                                >
+                                    {{ p.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    {% endfor %}
+
+                    <button class="btn btn-primary mt-2">Save Personas</button>
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN FOR COMMENTS -->
+        <div class="col-12 col-lg-4">
+
+            <h4>Comments ({{ book.comments|length }})</h4>
+
+            {% if current_user.is_authenticated %}
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.body(class="form-control", rows=4) }}
+                    </div>
+
+                    {{ form.submit(class="btn btn-primary w-100") }}
+                </form>
+            {% else %}
+                <p><a href="{{ url_for('auth.login') }}">Log in</a> to comment.</p>
             {% endif %}
 
-            <div class="mt-4">
-                <p><strong>Summary:</strong> {{ book.summary }}</p>
-            </div>
+            <hr>
 
-            <hr class="my-4">
+            {% for comment in book.comments %}
+                <div class="card mb-3">
+                    <div class="card-body">
 
-        </div>
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ comment.user.username }}</strong>
 
-        <h3 class="mt-4">What personas fit this book the best?</h3>
+                            {% if comment.created_at %}
+                                <small class="text-muted">
+                                    {{ comment.created_at.strftime('%b %d, %Y') }}
+                                </small>
+                            {% endif %}
+                        </div>
 
-<form action="{{ url_for('books.set_personas', book_id=book.id) }}" method="POST">
+                        <p class="mt-2 mb-0">{{ comment.content }}</p>
 
-    {% for i in range(1, 4) %}
-        <label class="form-label">Persona {{ i }}</label>
-        <select name="persona_{{ i }}" class="form-select mb-2">
-            <option value="">-- Select Persona --</option>
-            {% for p in personas %}
-                <option value="{{ p.id }}">{{ p.name }}</option>
+                    </div>
+                </div>
+            {% else %}
+                <p>No comments yet.</p>
             {% endfor %}
-        </select>
-    {% endfor %}
 
-    <button class="btn btn-primary mt-3">Save Personas</button>
-</form>
-
-        <div class="col-4">
-            <h4>Comments</h4>
-            <div class="border p-3 bg-light">
-                <p><em>“This section will maybe display user comments later.”</em></p>
-                <p><strong>Big Bruce:</strong> “Kind overrated tbh. Drink beer while reading it to make it better”</p>
-            </div>
         </div>
-
     </div>
 </div>
 
