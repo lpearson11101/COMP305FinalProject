@@ -215,6 +215,35 @@
                                     {{ comment.created_at.strftime('%b %d, %Y') }}
                                 </small>
                             {% endif %}
+
+                            {% if current_user.is_authenticated
+                                    and current_user.id == comment.user_id %}
+
+                                    <a
+                                        href="{{ url_for('books.edit_comment',
+                                                        comment_id=comment.id) }}"
+                                        class="btn btn-sm btn-outline-primary ms-2">
+                                        Edit
+                                    </a>
+
+                                    <form
+                                        method="POST"
+                                        action="{{ url_for('books.delete_comment',
+                                                            comment_id=comment.id) }}"
+                                        style="display:inline">
+
+                                        {{ form.csrf_token }}
+
+                                        <button
+                                            type="submit"
+                                            class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Delete this comment?');">
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
                         </div>
 
                         <p class="mt-2 mb-0">{{ comment.content }}</p>
