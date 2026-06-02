@@ -5,46 +5,137 @@
 {% block content %}
 
 <div class="mt-4">
-
-    <h1>
-        {{ current_user.username }}
-    </h1>
-
-    <p class="text-muted">
-        Welcome to your profile. 
-    </p>
-
+    <h1>{{ current_user.username }}</h1>
+    <p class="text-muted">Welcome to your profile.</p>
 </div>
 
-<!--I used layout.it to get the code for these three columns. Should ideally display user
-book lists.-->
 <div class="mt-5 container">
   <div class="row">
+
     <div class="col-4">
       <div class="card text-white bg-dark">
-        <div class="card-header">To read</div>
+        <div class="card-header">To Read</div>
         <div class="card-body">
-          <!--put links to books in here-->
+
+          {% if to_read_books %}
+            <ul class="list-unstyled">
+              {% for entry in to_read_books %}
+                <li class="mb-2">
+
+                  <a class="text-light" href="{{ url_for('books.detail', book_id=entry.book.id) }}">
+                    {{ entry.book.title }}
+                  </a>
+
+                  <form action="{{ url_for('books.remove_to_read', book_id=entry.book.id) }}"
+                        method="POST" style="display:inline;">
+                    <button class="btn btn-sm btn-danger">Remove</button>
+                  </form>
+
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">No books in your to‑read list.</p>
+          {% endif %}
+
         </div>
       </div>
     </div>
+
     <div class="col-4">
       <div class="card text-white bg-dark">
-        <div class="card-header">My books</div>
+        <div class="card-header">My Books</div>
         <div class="card-body">
-          <!--put links to books in here-->
+
+          {% if read_books %}
+            <ul class="list-unstyled">
+              {% for entry in read_books %}
+                <li class="mb-2">
+
+                  <a class="text-light" href="{{ url_for('books.detail', book_id=entry.book.id) }}">
+                    {{ entry.book.title }}
+                  </a>
+
+                  <form action="{{ url_for('books.unmark_read', book_id=entry.book.id) }}"
+                        method="POST" style="display:inline;">
+                    <button class="btn btn-sm btn-danger">Unmark</button>
+                  </form>
+
+                 {% if entry.personas %}
+    <strong>Personas:</strong>
+    <ul>
+        {% for p in entry.personas %}
+            <li>{{ p.persona.name }} (Rank {{ p.ranking }})</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">You haven't marked any books as read.</p>
+          {% endif %}
+
         </div>
       </div>
     </div>
+
     <div class="col-4">
       <div class="card text-white bg-dark">
         <div class="card-header">Top 5</div>
         <div class="card-body">
-          <!--put links to books in here-->
+
+          {% if top_five_books %}
+            <ol class="list-unstyled">
+              {% for entry in top_five_books %}
+                <li class="mb-2">
+
+    <a class="text-light" href="{{ url_for('books.detail', book_id=entry.book.id) }}">
+        {{ entry.book.title }}
+    </a>
+
+   
+    {% if entry.top_five > 1 %}
+    <form action="{{ url_for('books.top_five_up', book_id=entry.book.id) }}"
+          method="POST" style="display:inline;">
+        <button class="btn btn-sm btn-secondary">+</button>
+    </form>
+    {% endif %}
+
+    
+    {% if entry.top_five < 5 %}
+    <form action="{{ url_for('books.top_five_down', book_id=entry.book.id) }}"
+          method="POST" style="display:inline;">
+        <button class="btn btn-sm btn-secondary">-</button>
+    </form>
+    {% endif %}
+
+    
+    <form action="{{ url_for('books.remove_top_five', book_id=entry.book.id) }}"
+          method="POST" style="display:inline;">
+        <button class="btn btn-sm btn-danger">Remove</button>
+    </form>
+
+</li>
+
+              {% endfor %}
+            </ol>
+          {% else %}
+            <p class="text-muted">No top‑five books yet.</p>
+          {% endif %}
+
         </div>
       </div>
     </div>
+
   </div>
+</div>
+<div class="mt-5 text-center">
+  <h3>Persona List</h3>
+  <button class="btn btn-info mt-3" disabled>
+      Calculate Top Persona (W.I.P)
+  </button>
 </div>
 
 {% endblock %}
