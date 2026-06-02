@@ -4,42 +4,50 @@
 {% block content %}
 <h1>{{ user.username }}</h1>
 
+<h3 class="mt-4">Top Three Personas</h3>
+{% if top_three_personas %}
+  <ul class="list-unstyled">
+    {% for aggregate in top_three_personas %}
+        <li class="mb-2">
+            <strong>{{ aggregate.persona.name }}</strong> - {{ aggregate.score|int }} pts
+        </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No personas calculated yet.</p>
+{% endif %}
+
 <h3 class="mt-4">Top 5</h3>
-<ul>
+{% if top_five %}
+  <ul>
     {% for entry in top_five %}
         <li>{{ entry.top_five }}. {{ entry.book.title }}</li>
     {% endfor %}
-</ul>
+  </ul>
+{% else %}
+  <p class="text-muted">No top 5 books yet.</p>
+{% endif %}
 
 <h3 class="mt-4">To‑Read</h3>
-<ul>
+{% if to_read %}
+  <ul>
     {% for entry in to_read %}
         <li>{{ entry.book.title }}</li>
     {% endfor %}
-</ul>
+  </ul>
+{% else %}
+  <p class="text-muted">No books in to-read list.</p>
+{% endif %}
 
 <h3 class="mt-4">Read</h3>
-<ul>
+{% if read %}
+  <ul>
     {% for entry in read %}
         <li>{{ entry.book.title }}</li>
-        <h3 class="mt-4">Personas</h3>
-<ul>
-        {% for persona in entry.personas %}
-            <li>{{ entry.book.title }} — {{ p.persona }}</li>
-        {% endfor %}
-</ul>
-
     {% endfor %}
-</ul>
-
-<h3 class="mt-4">Personas</h3>
-<ul>
-    {% for entry in read %}
-        {% for p in entry.personas %}
-            <li>{{ entry.book.title }} — {{ p.persona.name }} (Rank {{ p.ranking }})</li>
-        {% endfor %}
-    {% endfor %}
-</ul>
-
+  </ul>
+{% else %}
+  <p class="text-muted">No books read yet.</p>
+{% endif %}
 
 {% endblock %}

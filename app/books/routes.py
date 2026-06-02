@@ -17,6 +17,7 @@ from app.models.persona import Persona
 from app.models.userbookpersona import UserBookPersona
 from app.models.bookpersonaaggregate import BookPersonaAggregate
 from app.services.persona_scoring import recalculate_book_personas
+from app.services.user_persona_scoring import recalculate_user_personas
 
 @bp.route('/', methods=('GET', 'POST'))
 def index():
@@ -251,6 +252,7 @@ def add_top_five(book_id):
 
     db.session.commit()
     fix_top_five(user_id)
+    recalculate_user_personas(user_id)
 
     flash("Added to Top Five.", "success")
     return redirect(url_for('books.detail', book_id=book_id))
@@ -296,6 +298,7 @@ def remove_top_five(book_id):
         entry.top_five = None
         db.session.commit()
         fix_top_five(user_id)
+        recalculate_user_personas(user_id)
     
     return redirect(url_for('users.profile'))
 
@@ -353,6 +356,7 @@ def top_five_up(book_id):
         entry.top_five -= 1
         db.session.commit()
         fix_top_five(user_id)
+        recalculate_user_personas(user_id)
     return redirect(url_for('users.profile'))
 
 
@@ -380,6 +384,7 @@ def top_five_down(book_id):
         )
         db.session.commit()
         fix_top_five(user_id)
+        recalculate_user_personas(user_id)
 
     return redirect(url_for('users.profile'))
 
@@ -550,6 +555,12 @@ def set_personas(book_id):
 
     #recalculate aggregate persona scores for the book
     recalculate_book_personas(book_id)
+
+    #recalculate user personas for the affected users after the book's personas change
+    affected_userbooks = UserBook.query.filter_by(book_id=book_id).all()
+    affected_user_ids = {ub.user_id for ub in affected_userbooks}
+    for user_id in affected_user_ids:
+        recalculate_user_personas(user_id)
     flash("Personas updated.", "success")
 
     return redirect(url_for('books.detail', book_id=book_id))
