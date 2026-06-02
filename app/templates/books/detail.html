@@ -3,6 +3,17 @@
 {% block content %}
 
 <div class="container mt-4">
+
+    <!-- display flash messages for success or error feedback on actions like rating, marking read, etc. -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
     <div class="row gy-4">
 
         <!-- LEFT COLUMN FOR BOOK DETAILS, RATINGS, AND PERSONAS -->
@@ -120,12 +131,6 @@
         <div class="col-12 col-lg-4">
 
             <h4>Comments ({{ book.comments|length }})</h4>
-
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endwith %}
 
             {% if current_user.is_authenticated %}
                 <form method="POST">

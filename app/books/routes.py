@@ -93,32 +93,59 @@ def detail(book_id):
 
     return render_template('books/detail.html', book=book, personas= personas, form=form, cover_path=cover_path)
 
+#route for rating aura. Updates or creates a UserBook entry for the user and book, then updates the book's average ratings.
 @bp.route('/rate_aura/<int:book_id>', methods=['POST'])
 @login_required
 def rate_aura(book_id):
-    rating = float(request.form.get('aura'))
-    user_id = current_user.id
-    entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
+    raw = request.form.get('aura')
+
+    if not raw:
+        flash("Please enter an A.U.R.A rating before submitting.", "danger")
+        return redirect(url_for('books.detail', book_id=book_id))
+
+    try:
+        rating = float(raw)
+    except ValueError:
+        flash("Invalid A.U.R.A rating.", "danger")
+        return redirect(url_for('books.detail', book_id=book_id))
+
+    entry = UserBook.query.filter_by(user_id=current_user.id, book_id=book_id).first()
     if not entry:
-        entry = UserBook(user_id=user_id, book_id=book_id)
+        entry = UserBook(user_id=current_user.id, book_id=book_id)
         db.session.add(entry)
+
     entry.aura = rating
     db.session.commit()
     update_book_averages(book_id)
+
     return redirect(url_for('books.detail', book_id=book_id))
 
+
+#route for rating enjoyment. Similar to aura route but updates enjoyment field instead
 @bp.route('/rate_enjoyment/<int:book_id>', methods=['POST'])
 @login_required
 def rate_enjoyment(book_id):
-    rating = float(request.form.get('enjoyment'))
-    user_id = current_user.id
-    entry = UserBook.query.filter_by(user_id=user_id, book_id=book_id).first()
+    raw = request.form.get('enjoyment')
+
+    if not raw:
+        flash("Please enter an enjoyment rating before submitting.", "danger")
+        return redirect(url_for('books.detail', book_id=book_id))
+
+    try:
+        rating = float(raw)
+    except ValueError:
+        flash("Invalid enjoyment rating.", "danger")
+        return redirect(url_for('books.detail', book_id=book_id))
+
+    entry = UserBook.query.filter_by(user_id=current_user.id, book_id=book_id).first()
     if not entry:
-        entry = UserBook(user_id=user_id, book_id=book_id)
+        entry = UserBook(user_id=current_user.id, book_id=book_id)
         db.session.add(entry)
+
     entry.enjoyment = rating
     db.session.commit()
     update_book_averages(book_id)
+
     return redirect(url_for('books.detail', book_id=book_id))
 
 @bp.route('/mark_read/<int:book_id>', methods=['POST'])
@@ -163,10 +190,12 @@ def add_top_five(book_id):
 
     # If already in top five, do nothing
     if entry.top_five:
+        flash("This book is already in your Top Five.", "info")
         return redirect(url_for('books.detail', book_id=book_id))
 
     # If full, do nothing
     if len(current_ranks) >= 5:
+        flash("Your Top Five is already full. Remove a book first.", "danger")
         return redirect(url_for('books.detail', book_id=book_id))
 
     # Assign next available rank
@@ -179,6 +208,7 @@ def add_top_five(book_id):
     db.session.commit()
     fix_top_five(user_id)
 
+    flash("Added to Top Five.", "success")
     return redirect(url_for('books.detail', book_id=book_id))
 
 def fix_top_five(user_id):
