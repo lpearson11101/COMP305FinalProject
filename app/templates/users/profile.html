@@ -80,15 +80,6 @@
                     <button class="btn btn-sm btn-danger">Unmark</button>
                   </form>
 
-                 {% if entry.personas %}
-    <strong>Personas:</strong>
-    <ul>
-        {% for p in entry.personas %}
-            <li>{{ p.persona.name }} (Rank {{ p.ranking }})</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
                 </li>
               {% endfor %}
             </ul>

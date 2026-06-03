@@ -45,7 +45,23 @@ def index():
 
 @bp.route('/books')
 def books():
-    return render_template('books/search.html')
+    page = request.args.get('page', 1, type=int)
+    
+    # Query all books with pagination
+    paginated_books = Book.query.paginate(page=page, per_page=20)
+    
+    # Attach cover_path to each book
+    for book in paginated_books.items:
+        if book.cover_id:
+            cover_file = f"covers/{book.cover_id}.jpg"
+            full_path = Path("app/static") / cover_file
+            if full_path.exists():
+                book.cover_path = cover_file
+            else:
+                book.cover_path = "covers/default.jpg"
+        else:
+            book.cover_path = "covers/default.jpg"
+    return render_template('books/search.html', paginated_books=paginated_books)
 
 
 #route to search for books by title or author. Uses ilike for case-insensitive partial matching. 
