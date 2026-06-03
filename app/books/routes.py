@@ -382,11 +382,10 @@ def admin_page(book_id):
 
 #route to edit books from the admin edit page
 @bp.route('/edit_book/<int:book_id>', methods=['POST'])
+@login_required
 def edit_book(book_id):
-    from flask_login import current_user
-
     #check if user is admin before allowing access to edit functionality. If not, return 403 error.
-    if current_user.role != 'admin':
+    if not current_user.is_authenticated or current_user.role != 'admin':
         return "You're not fancy enough", 403
 
     #get the book to edit from the database. If it doesn't exist, return 404 error.

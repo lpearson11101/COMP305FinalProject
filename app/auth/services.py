@@ -1,6 +1,7 @@
 import re
+
+#check if password is valid
 def validate_password(password):
-    # Implement password validation logic here
     if len(password) < 8:
         return False, "Password must be at least 8 characters long."
 

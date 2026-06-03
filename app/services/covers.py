@@ -1,3 +1,5 @@
+#Handle cover image caching and retrieval
+
 import os
 import requests
 from pathlib import Path
@@ -9,22 +11,19 @@ COVER_DIR.mkdir(parents=True, exist_ok=True)
 
 OPEN_LIBRARY_URL = "https://covers.openlibrary.org/b/id/{cover_id}-L.jpg"
 
-
+#get the local file path for a cover image based on its cover ID. 
 def get_cover_path(cover_id: int) -> Path:
     """Return local file path for a cover image."""
     return COVER_DIR / f"{cover_id}.jpg"
 
-
+#check for cover path to see if it exists.
 def cover_exists(cover_id: int) -> bool:
     """Check if cover already exists locally."""
     return get_cover_path(cover_id).exists()
 
-
+#download cover from Open Library and save it locally.
 def download_cover(cover_id: int) -> bool:
-    """
-    Download cover from Open Library and save locally.
-    Returns True if successful.
-    """
+    #use the Covers API to get the image for the cover_id
     url = OPEN_LIBRARY_URL.format(cover_id=cover_id)
     path = get_cover_path(cover_id)
 
@@ -59,6 +58,7 @@ def download_cover(cover_id: int) -> bool:
             pass
         return False
 
+#make sure the cover is cached locally and return the path if it is. Otherwise, return None
 def ensure_cover_cached(cover_id: int) -> str | None:
     if not cover_id:
         return None

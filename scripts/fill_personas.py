@@ -1,3 +1,5 @@
+#this script is used to fill the personas table with the different personas that users can choose from when creating their profile. 
+# Run this script once to fill the table
 import sys
 from pathlib import Path
 

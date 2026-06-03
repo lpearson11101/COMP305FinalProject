@@ -27,9 +27,11 @@ def register():
 
     if request.method == "POST":
 
+        # Get form data
         username = request.form.get("username")
         password = request.form.get("password")
 
+        #check if username already exists
         existing_user = User.query.filter_by(
             username=username
         ).first()
@@ -39,13 +41,14 @@ def register():
                 "auth/register.html",
                 error="Username already taken!"
             )
-        
+        #require username and password
         if not username or not password:
             return render_template(
                 "auth/register.html",
                 error="Username and password are required!"
             )
         
+        #make sure password is strong enough
         is_valid, message = validate_password(password)
 
         if not is_valid:
@@ -55,11 +58,13 @@ def register():
                 error=message
             )
 
+        #hash the password before storing in the database
         hashed_password = generate_password_hash(
             password,
             method="pbkdf2:sha256"
         )
 
+        #create new user and save to database
         new_user = User(
             username=username,
             password_hash=hashed_password
@@ -68,6 +73,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        #redirect to login after successful registration
         return redirect(url_for("auth.login"))
     return render_template("auth/register.html")
 
@@ -75,6 +81,8 @@ def register():
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
+
+        #get username and password from form
         username = request.form.get("username")
         password = request.form.get("password")
 
@@ -82,6 +90,7 @@ def login():
             username=username
         ).first()
 
+        #check if user exists and password is correct
         if user and check_password_hash(
             user.password_hash,
             password
@@ -91,6 +100,7 @@ def login():
                 url_for("users.profile")
             )
 
+        #give error message if login fails
         return render_template(
             "auth/login.html",
             error="Invalid username or password"

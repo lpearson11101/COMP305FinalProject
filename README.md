@@ -6,16 +6,18 @@ How to run the app (development server):
 - In the terminal with environment activated:
     - set FLASK_APP=app
     - set FLASK_ENV=development
-    - flask run
 
-Use to make sure database schema is up-to-date:  
-    - flask db upgrade
+Use to make sure database schema is up-to-date (in the terminal):  
+- flask db upgrade
 
 To populate the Books table:  
-    - python scripts/load_books.py
+- python scripts/load_books.py
 
 To populate the Users table:  
-    - python scripts/seed_users.py
+- python scripts/seed_users.py
 
 To populate the persona table:  
-    - python scripts/fill_personas.py
+- python scripts/fill_personas.py
+
+To run the app (in the terminal): 
+- flask run
