@@ -10,6 +10,23 @@
     <p class="text-muted">You are viewing {{ user.username }}'s profile.</p>
 </div>
 
+<!-- TOP THREE PERSONAS -->
+
+<div class="mt-5">
+    <h2>Top Three Personas</h2>
+    {% if top_three_personas %}
+      <ul class="list-unstyled">
+        {% for aggregate in top_three_personas %}
+            <li class="mb-2">
+                <strong>{{ aggregate.persona.name }}</strong> - {{ aggregate.score|int }} pts
+            </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No personas calculated yet.</p>
+    {% endif %}
+</div>
+
 <div class="mt-5 container">
   <div class="row">
 
