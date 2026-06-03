@@ -52,7 +52,9 @@ def books():
     
     # Attach cover_path to each book
     for book in paginated_books.items:
+        #check if book has a cover_id. if not, use default cover
         if book.cover_id:
+            #check if the cover has been cached locally, if so use it, otherwise use default
             cover_file = f"covers/{book.cover_id}.jpg"
             full_path = Path("app/static") / cover_file
             if full_path.exists():
@@ -61,6 +63,7 @@ def books():
                 book.cover_path = "covers/default.jpg"
         else:
             book.cover_path = "covers/default.jpg"
+    # Render the template with the paginated books
     return render_template('books/search.html', paginated_books=paginated_books)
 
 

@@ -12,6 +12,7 @@ class Persona(db.Model):
     # A persona's description, chr limit of 1000 and cannot be null
     description = db.Column(db.String(1000), nullable=False)
 
+    #relationships between persona and userbookpersona, userpersonaaggregate, bookpersonaaggregate
     user_book_personas = db.relationship(
     "UserBookPersona",
     back_populates="persona"
@@ -25,6 +26,7 @@ class Persona(db.Model):
     book_persona_aggregates = db.relationship(
     "BookPersonaAggregate",
     back_populates="persona",
+    # When a Persona is deleted, all related BookPersonaAggregate records are also deleted.
     cascade="all, delete-orphan"
     )
 
